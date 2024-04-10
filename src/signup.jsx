@@ -1,12 +1,23 @@
 import React, { useState } from 'react';
-
+import { v4 as uuidv4 } from 'uuid';
 function Signup() {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [email, setEmail] = useState('');
   const [userType, setUserType] = useState('');
   const [password, setPassword] = useState('');
+  const [uniqueId, setUniqueId] = useState('');
+  
+  const handleGenerateUniqueId = () => {
+    // Concatenate username and password to create a unique string
+    const uniqueString = `${email}:${password}`;
 
+    // Generate a UUID based on the unique string
+    const generatedUniqueId = uuidv4(uniqueString);
+
+    // Set the generated unique ID to state
+    setUniqueId(generatedUniqueId);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -15,7 +26,7 @@ function Signup() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, age, email, userType, password }),
+        body: JSON.stringify({ name, age, email, userType, password,uniqueId }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -29,7 +40,7 @@ function Signup() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className='form-container'>
       <label>
         Name:
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
@@ -55,7 +66,13 @@ function Signup() {
         Password:
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
       </label>
-      <button type="submit">Sign Up</button>
+      <button type="submit" onClick={handleGenerateUniqueId}>Sign Up</button>
+      {uniqueId && (
+        <div>
+          <h2>Unique ID:</h2>
+          <p>{uniqueId}</p>
+        </div>
+      )}
     </form>
   );
 }
